@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
@@ -21,7 +22,7 @@ class _HomeScreenState extends State<HomeScreen> {
   void initState() {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       cityController.text = "Surat";
-      Provider.of<WeatherProvider>(context, listen: false).fetchWeather(cityController.text);
+      Provider.of<WeatherProvider>(context, listen: false).fetchWeather(cityController.text.trim());
     });
     super.initState();
   }
@@ -57,10 +58,13 @@ class _HomeScreenState extends State<HomeScreen> {
             child: ListView(
               padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
               children: [
+                //Search Widget
                 TextFormField(
                   controller: cityController,
                   onEditingComplete: (){
-                    if (cityController.text.trim().isNotEmpty) {
+                    cityController.text = cityController.text.trim();
+                    if (cityController.text.isNotEmpty) {
+                      FocusScope.of(context).unfocus();
                       Provider.of<WeatherProvider>(context, listen: false).fetchWeather(cityController.text);
                     }
                   },
@@ -86,7 +90,9 @@ class _HomeScreenState extends State<HomeScreen> {
                           child: Text("Search"),
                         ),
                         onPressed: () {
-                          if (cityController.text.trim().isNotEmpty) {
+                          cityController.text = cityController.text.trim();
+                          if (cityController.text.isNotEmpty) {
+                            FocusScope.of(context).unfocus();
                             Provider.of<WeatherProvider>(context, listen: false).fetchWeather(cityController.text);
                           }
                         },
@@ -94,6 +100,8 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                   ),
                 ),
+
+                //Invalid or No-Data Widget
                 if (!provider.isLoading && provider.weather == null)
                   Container(
                     margin: const EdgeInsets.only(top: 15),
@@ -110,6 +118,8 @@ class _HomeScreenState extends State<HomeScreen> {
                       ],
                     ),
                   ),
+
+                //Loader Widget
                 if (provider.isLoading)
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
@@ -137,6 +147,8 @@ class _HomeScreenState extends State<HomeScreen> {
                       ),
                     ],
                   ),
+
+                //Today's date widget
                 if (provider.weather != null)
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
@@ -155,6 +167,8 @@ class _HomeScreenState extends State<HomeScreen> {
                       ),
                     ],
                   ),
+
+                //Weather card widget
                 if (provider.weather != null) WeatherCard(weather: provider.weather!)
               ],
             ),
